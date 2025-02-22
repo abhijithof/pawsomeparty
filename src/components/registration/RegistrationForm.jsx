@@ -5,6 +5,7 @@ import PetInfo from './PetInfo'
 import { useState } from 'react'
 import SubscriptionPlan from './SubscriptionPlan'
 import ProductSelection from './ProductSelection'
+import SubmissionSuccess from './SubmissionSuccess'
 
 const personalInfoValidation = Yup.object({
   name: Yup.string().required('Name is required'),
@@ -39,6 +40,8 @@ const productSelectionValidation = Yup.object({
 function RegistrationForm() {
   const [step, setStep] = useState(1)
   const [showErrors, setShowErrors] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [submittedData, setSubmittedData] = useState(null)
 
   const initialValues = {
     name: '',
@@ -59,6 +62,9 @@ function RegistrationForm() {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       console.log('Form values:', values)
+      // Here you would typically make an API call
+      setSubmittedData(values)
+      setIsSuccess(true)
       setSubmitting(false)
     } catch (error) {
       console.error('Form submission error:', error)
@@ -94,6 +100,10 @@ function RegistrationForm() {
       default:
         return null
     }
+  }
+
+  if (isSuccess && submittedData) {
+    return <SubmissionSuccess formData={submittedData} />
   }
 
   return (

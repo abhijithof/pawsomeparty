@@ -4,7 +4,7 @@ import { SUBSCRIPTION_PLANS, PRODUCT_VARIANTS } from '@/constants/formData'
 import ProductVariantModal from './ProductVariantModal'
 import { CheckIcon } from '@heroicons/react/24/outline'
 
-function ProductSelection({ showErrors }) {
+function ProductSelection({ showErrors, onSubmit }) {
   const [selectedProducts, setSelectedProducts] = useState({
     food: [],
     grooming: [],
@@ -76,38 +76,23 @@ function ProductSelection({ showErrors }) {
   }
 
   const handleVariantSelect = (variant, form) => {
-    const currentPlan = SUBSCRIPTION_PLANS.find(
-      plan => plan.id === form.values.subscriptionPlan
-    )
+    const newSelectedVariants = { ...selectedVariants }
+    newSelectedVariants[currentProduct.id] = variant
+    setSelectedVariants(newSelectedVariants)
     
+    // Update form values
     const newSelected = { ...selectedProducts }
-    const newVariants = { ...form.values.selectedProducts?.variants || {} }
     const category = currentProduct.category
-    
-    // If plan only allows one product in this category, remove previous selection
-    if (currentPlan.allowances[category] === 1) {
-      newSelected[category] = []
-      // Remove variants for any previously selected products in this category
-      Object.keys(newVariants).forEach(productId => {
-        if (availableProducts[category].some(p => p.id === productId)) {
-          delete newVariants[productId]
-        }
-      })
-    }
-    
-    // Add new selection
-    newVariants[currentProduct.id] = variant
     if (!newSelected[category].includes(currentProduct.id)) {
-      newSelected[category].push(currentProduct.id)
+      newSelected[category] = [...newSelected[category], currentProduct.id]
     }
-    
     setSelectedProducts(newSelected)
-    setSelectedVariants(newVariants)
     
-    // Update form values with both selected products and variants
     form.setFieldValue('selectedProducts', {
-      ...newSelected,
-      variants: newVariants
+      food: newSelected.food,
+      grooming: newSelected.grooming,
+      toys: newSelected.toys,
+      variants: newSelectedVariants
     })
   }
 
@@ -142,8 +127,10 @@ function ProductSelection({ showErrors }) {
                             key={product.id}
                             type="button"
                             onClick={() => handleProductClick(product, form)}
-                            className={`product-card ${
-                              selectedProducts[category].includes(product.id) ? 'active' : ''
+                            className={`product-card relative transition-all border-2 ${
+                              selectedProducts[category].includes(product.id) 
+                              ? 'border-brand-blue bg-brand-cream/20' 
+                              : 'border-transparent hover:border-brand-blue/20'
                             }`}
                           >
                             <span className="text-4xl mb-2">{product.image}</span>
@@ -188,6 +175,22 @@ function ProductSelection({ showErrors }) {
           className="form-error" 
         />
       )}
+
+      <div className="flex justify-between mt-8">
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="btn-secondary"
+        >
+          Previous
+        </button>
+        <button
+          type="submit"
+          className="btn-primary"
+        >
+          Submit
+        </button>
+      </div>
     </div>
   )
 }
