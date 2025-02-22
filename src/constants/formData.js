@@ -39,7 +39,6 @@ export const SUBSCRIPTION_PLANS = [
     features: [
       '1 Food Item (Limited choices)',
       '1 Grooming Product',
-      '1 Toy or Accessory',
       'Monthly Delivery'
     ]
   },
